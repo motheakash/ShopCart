@@ -1,0 +1,77 @@
+# Byte-compiled files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# Django migrations
+*/migrations/
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Database files
+*.sqlite3
+*.db
+
+# Media files
+media/
+
+# Static files
+staticfiles/
+
+# Local environment files
+.env
+.local_env
+
+# VS Code settings
+.vscode/
+
+# IDEs and editors
+.idea/
+*.suo
+*.ntvs_analysis.dat
+*.ncb
+*.sw?
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+
+# Coverage reports
+.coverage
+*.cover
+*.py,cover
+nosetests.xml
+coverage.xml
+*.hypothesis/
+.pytest_cache/
+
+# Django-specific
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+db.sqlite3
+*.sqlite3
+
+# Pyenv
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# pip
+Pipfile
+*.egg-info
+dist/
+build/
+
+# mypy
+.mypy_cache/
+
+# Test data
+test_data/
