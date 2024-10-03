@@ -27,6 +27,7 @@ CUSTOME_APPS = [
     'apps.core',
     'apps.authentications',
     'apps.member_management',
+    'apps.product_management',
 ]
 
 INSTALLED_APPS.extend(CUSTOME_APPS)
