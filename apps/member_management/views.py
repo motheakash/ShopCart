@@ -11,6 +11,7 @@ from .services import MemberService
 from apps.core.utils import CustomPagination
 from apps.authentications.permissions import IsAuthenticated, is_authorized
 from django.utils.decorators import method_decorator
+from cache_layer.decorators import cache_decorator
 
 
 
@@ -30,6 +31,7 @@ class MemberAPIView(ListCreateAPIView):
         return self.service_class.get_all_members()
 
     @method_decorator(is_authorized)
+    # @method_decorator(cache_decorator(ttl=60), name='get')
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """
         Handle GET requests, retrieve the paginated list of members, and return the response.
@@ -78,7 +80,7 @@ class MemberByIdView(RetrieveDestroyAPIView):
         """
         member_id = self.kwargs.get('member_id')
         if not member_id:
-            raise NotFound('Member ID not provided.')
+            raise NotFound('member_id not provided.')
         member = self.service_class.get_member_by_id(member_id)
         if not member:
             raise NotFound('Member not found.')
