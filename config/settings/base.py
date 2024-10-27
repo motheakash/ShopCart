@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = 'your-secret-key'
 DEBUG = False
 FROM_EMAIL = 'motheakash11@gmail.com'
+MAX_ADDRESSES = 5
 
 ALLOWED_HOSTS = []
 
