@@ -11,7 +11,6 @@ from apps.core.utils import CustomPagination
 from .service import ProductService
 from .serializers import ProductSerializer, ValidateProduct
 from apps.authentications.permissions import IsAuthenticated, is_authorized
-from cache_layer.decorators import cache_decorator
 from .models import ProductCategory, Product
 
 
@@ -27,7 +26,6 @@ class ProductAPI(APIView):
         return self.service_class.get_all_products()
 
     @method_decorator(is_authorized)
-    @method_decorator(cache_decorator(ttl=60), name='get')
     def get(self, request, *args, **kwargs):
         try:
             page_size: int = int(request.GET.get('page_size', 10))
