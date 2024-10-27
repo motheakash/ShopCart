@@ -12,8 +12,6 @@ from .services import MemberService, AddressService
 from apps.core.utils import CustomPagination
 from apps.authentications.permissions import IsAuthenticated, is_authorized
 from django.utils.decorators import method_decorator
-from cache_layer.decorators import cache_decorator
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 
 
@@ -34,7 +32,6 @@ class MemberAPIView(ListCreateAPIView):
         return self.service_class.get_all_members()
 
     @method_decorator(is_authorized)
-    # @method_decorator(cache_decorator(ttl=60), name='get')
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """
         Handle GET requests, retrieve the paginated list of members, and return the response.
