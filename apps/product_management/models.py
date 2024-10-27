@@ -16,7 +16,7 @@ class ProductCategory(BaseModel):
 
 class Product(BaseModel):
     product_id = models.AutoField(db_column="ProductId", primary_key=True)
-    category_id = models.ForeignKey(ProductCategory, db_column='CategoryId', on_delete=models.CASCADE)
+    category_id = models.ForeignKey(ProductCategory, db_column='CategoryId', on_delete=models.DO_NOTHING)
     brand = models.CharField(db_column="Brand", max_length=100)
     name = models.CharField(db_column="Name", max_length=100)
     description = models.TextField(db_column="Description", blank=True, null=True)

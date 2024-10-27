@@ -1,7 +1,7 @@
 from typing import Optional, Any
 from django.utils import timezone
 from django.db.models import QuerySet
-from .models import Member
+from .models import Member, Address
 
 
 class MemberService:
@@ -32,3 +32,13 @@ class MemberService:
     @staticmethod
     def get_member_by_active_state(active: bool) -> Optional[Member]:
         return Member.objects.filter(active=active)
+    
+
+class AddressService:
+    @staticmethod
+    def get_member_address(member_id: int) -> Optional[Address]:
+        return Address.objects.filter(member_id=member_id)
+    
+    @staticmethod
+    def add_address(data: dict):
+        Address.objects.create(**data)

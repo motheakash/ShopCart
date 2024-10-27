@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Member
+from .models import Member, Address
 
 # Register your models here.
 class MemberAdmin(admin.ModelAdmin):
@@ -12,4 +12,13 @@ class MemberAdmin(admin.ModelAdmin):
     custom_member_id.short_description = 'Member Id'
 
 
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ('address_id', 'memberid', 'street_address', 'address_type')
+    exclude = ('deleted_at', )
+
+    def memberid(self, obj):
+        return obj.member_id.username
+
+
 admin.site.register(Member, MemberAdmin)
+admin.site.register(Address, AddressAdmin)

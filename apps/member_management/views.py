@@ -5,13 +5,16 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.exceptions import NotFound, PermissionDenied
 from rest_framework.generics import ListCreateAPIView, RetrieveDestroyAPIView
-from .serializers import MemberSerializer
-from .models import Member
-from .services import MemberService
+from rest_framework.views import APIView
+from .serializers import MemberSerializer, AddressSerializer
+from .models import Member, Address
+from .services import MemberService, AddressService
 from apps.core.utils import CustomPagination
 from apps.authentications.permissions import IsAuthenticated, is_authorized
 from django.utils.decorators import method_decorator
 from cache_layer.decorators import cache_decorator
+from django.shortcuts import get_object_or_404
+from django.db import transaction
 
 
 
@@ -113,3 +116,75 @@ class MemberByIdView(RetrieveDestroyAPIView):
             return Response({'message': 'Member deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
         except Exception as err:
             return Response({'error': str(err)}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class Addressview(APIView):
+    serializer_class = AddressSerializer
+    service_class = AddressService
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self) -> Union[QuerySet[Address], List[Address]]:
+        member_id = self.kwargs.get('member_id')
+        return self.service_class.get_member_address(member_id=member_id)
+
+    @method_decorator(is_authorized)
+    def get(self, request:Request, *args:any, **kwargs:any) -> Response:
+        try:
+           
+           queryset = self.get_queryset()
+           serializer = self.serializer_class(queryset, many=True)
+           return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as err:
+            return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    @method_decorator(is_authorized)
+    def post(self, request: Request, *args: any, **kwargs: any) -> Response:
+        try:
+            member_id = self.kwargs.get('member_id')
+            try:
+                member = Member.objects.get(member_id=member_id)
+            except Member.DoesNotExist:
+                return Response({'error': 'member not found with the member_id in request.'}, status=status.HTTP_404_NOT_FOUND)
+
+            payload = request.data
+            payload['member_id'] = member.member_id
+            
+            serializer = self.serializer_class(data=payload)
+            
+            if serializer.is_valid():
+                self.service_class.add_address(serializer.validated_data)
+                
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as err:
+            return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def patch(self, request: Request, *args: any, **kwargs: any) -> Response:
+        """
+        Edit member address.
+        """
+        try:
+            member_id = self.kwargs.get('member_id')
+            address_id = self.kwargs.get('address_id')
+            payload = request.data
+
+            try:
+                address = Address.objects.get(member_id=member_id, address_id=address_id)
+            except Member.DoesNotExist:
+                return Response({'error': 'address not found with member_id and address_id.'}, status=status.HTTP_404_NOT_FOUND)
+            
+            with transaction.atomic():
+                updatable_fields = ['street_address', 'city', 'state', 'postal_code', 'country', 'address_type']
+                for field in updatable_fields:
+                    if field in payload:
+                        setattr(address, field, payload[field])
+                
+                address.save()
+                
+                return Response({'message': 'Address updated successfully.'}, status=status.HTTP_200_OK)
+
+        except Exception as err:
+            return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
